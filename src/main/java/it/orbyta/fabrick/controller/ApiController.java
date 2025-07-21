@@ -5,6 +5,7 @@ import it.orbyta.fabrick.dto.response.FabricApiBaseResponse;
 import it.orbyta.fabrick.service.FabrickApiService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +24,11 @@ public class ApiController {
     }
 
     @GetMapping("/transaction")
-    public ResponseEntity<FabricApiBaseResponse> getTransaction() throws Exception {
-        return ResponseEntity.ok(fabrickApiService.getTransactionList(LocalDate.of(2024, 12, 1), LocalDate.now()));
+    public ResponseEntity<FabricApiBaseResponse> getTransaction(@RequestParam(name = "from")
+                                                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+                                                                @RequestParam(name = "to")
+                                                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) throws Exception {
+        return ResponseEntity.ok(fabrickApiService.getTransactionList(from, to));
     }
 
     @PostMapping("/transfer")
