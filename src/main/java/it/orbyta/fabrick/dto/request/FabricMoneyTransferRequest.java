@@ -1,6 +1,8 @@
 package it.orbyta.fabrick.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -11,25 +13,27 @@ import java.math.BigDecimal;
 public class FabricMoneyTransferRequest {
 
     @NotNull
+    @Valid
     public Creditor creditor;
     public String executionDate;
     public String uri;
-    @NotNull
+    @NotBlank
     public String description;
     @NotNull
     public BigDecimal amount;
-    @NotNull
+    @NotBlank
     public String currency;
-    public boolean isUrgent;
-    public boolean isInstant;
+    public Boolean isUrgent;
+    public Boolean isInstant;
     public String feeType;
     public String feeAccountId;
+    @Valid
     public TaxRelief taxRelief;
 
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Account {
-        @NotNull
+        @NotBlank
         public String accountCode;
         public String bicCode;
     }
@@ -37,37 +41,40 @@ public class FabricMoneyTransferRequest {
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Address {
-        public Object address;
-        public Object city;
-        public Object countryCode;
+        public String address;
+        public String city;
+        public String countryCode;
     }
 
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Creditor {
-        @NotNull
+        @NotBlank
         public String name;
         @NotNull
+        @Valid
         public Account account;
 
         public Address address;
     }
+
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class LegalPersonBeneficiary {
-        public Object fiscalCode;
-        @NotNull
-        public Object legalRepresentativeFiscalCode;
+        public String fiscalCode;
+        @NotBlank
+        public String legalRepresentativeFiscalCode;
     }
+
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class NaturalPersonBeneficiary {
-        @NotNull
+        @NotBlank
         public String fiscalCode1;
-        public Object fiscalCode2;
-        public Object fiscalCode3;
-        public Object fiscalCode4;
-        public Object fiscalCode5;
+        public String fiscalCode2;
+        public String fiscalCode3;
+        public String fiscalCode4;
+        public String fiscalCode5;
     }
 
     @Data
@@ -75,10 +82,10 @@ public class FabricMoneyTransferRequest {
     public static class TaxRelief {
         public String taxReliefId;
         @NotNull
-        public boolean isCondoUpgrade;
-        @NotNull
+        public Boolean isCondoUpgrade;
+        @NotBlank
         public String creditorFiscalCode;
-        @NotNull
+        @NotBlank
         public String beneficiaryType;
         public NaturalPersonBeneficiary naturalPersonBeneficiary;
         public LegalPersonBeneficiary legalPersonBeneficiary;
