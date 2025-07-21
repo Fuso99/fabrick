@@ -1,0 +1,11 @@
+spring:
+  application:
+  name: "fabrick"
+
+fabrick:
+  base-uri: https://sandbox.platfr.io
+  banking-accounts-uri: /api/gbs/banking/v4.0/accounts/
+  auth-schema: S2S
+  api-key: FXOVVXXHVCPVPBZXIJOBGUGSKHDNFRRQJP
+  #  id-chiave:  3202
+  account-id: 14537780
