@@ -1,94 +1,105 @@
 package it.orbyta.fabrick.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Data
+@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FabricMoneyTransferRequest {
 
     @NotNull
     @Valid
-    public Creditor creditor;
-    public String executionDate;
-    public String uri;
+    private Creditor creditor;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate executionDate;
+    private String uri;
     @NotBlank
-    public String description;
+    private String description;
     @NotNull
-    public BigDecimal amount;
+    private BigDecimal amount;
     @NotBlank
-    public String currency;
-    public Boolean isUrgent;
-    public Boolean isInstant;
-    public String feeType;
-    public String feeAccountId;
+    private String currency;
+    private Boolean isUrgent;
+    private Boolean isInstant;
+    private String feeType;
+    private String feeAccountId;
     @Valid
-    public TaxRelief taxRelief;
+    private TaxRelief taxRelief;
 
     @Data
+    @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Account {
         @NotBlank
-        public String accountCode;
-        public String bicCode;
+        private String accountCode;
+        private String bicCode;
     }
 
     @Data
+    @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Address {
-        public String address;
-        public String city;
-        public String countryCode;
+        private String address;
+        private String city;
+        private String countryCode;
     }
 
     @Data
+    @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Creditor {
         @NotBlank
-        public String name;
+        private String name;
         @NotNull
         @Valid
-        public Account account;
+        private Account account;
 
-        public Address address;
+        private Address address;
     }
 
     @Data
+    @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class LegalPersonBeneficiary {
-        public String fiscalCode;
+        private String fiscalCode;
         @NotBlank
-        public String legalRepresentativeFiscalCode;
+        private String legalRepresentativeFiscalCode;
     }
 
     @Data
+    @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class NaturalPersonBeneficiary {
         @NotBlank
-        public String fiscalCode1;
-        public String fiscalCode2;
-        public String fiscalCode3;
-        public String fiscalCode4;
-        public String fiscalCode5;
+        private String fiscalCode1;
+        private String fiscalCode2;
+        private String fiscalCode3;
+        private String fiscalCode4;
+        private String fiscalCode5;
     }
 
     @Data
+    @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class TaxRelief {
-        public String taxReliefId;
+        private String taxReliefId;
         @NotNull
-        public Boolean isCondoUpgrade;
+        private Boolean isCondoUpgrade;
         @NotBlank
-        public String creditorFiscalCode;
+        private String creditorFiscalCode;
         @NotBlank
-        public String beneficiaryType;
-        public NaturalPersonBeneficiary naturalPersonBeneficiary;
-        public LegalPersonBeneficiary legalPersonBeneficiary;
+        private String beneficiaryType;
+        private NaturalPersonBeneficiary naturalPersonBeneficiary;
+        private LegalPersonBeneficiary legalPersonBeneficiary;
     }
 
 

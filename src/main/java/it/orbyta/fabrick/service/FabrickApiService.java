@@ -50,6 +50,9 @@ public class FabrickApiService {
     private static final String TRANSACTIONS_PATH = "/transactions";
     private static final String MONEY_TRANSFER_PATH = "/payments/money-transfers";
 
+    private HttpClient httpClient = HttpClient.newHttpClient();
+
+
     public FabricApiBaseResponse<FabricBalanceResponse> getBalance() throws URISyntaxException, IOException, InterruptedException {
         URI uri = new URI(baseUri + bankingAccountsUri + accountId + BALANCE_PATH);
         HttpRequest request = buildGetRequest(uri);
@@ -100,7 +103,7 @@ public class FabrickApiService {
     private <T> T sendRequest(HttpRequest request, TypeReference<T> typeReference) throws IOException, InterruptedException {
         log.debug("Sending request to URI: {}", request.uri());
 
-        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response != null && HttpStatus.valueOf(response.statusCode()).is2xxSuccessful()) {
             T parsedResponse = om.readValue(response.body(), typeReference);
