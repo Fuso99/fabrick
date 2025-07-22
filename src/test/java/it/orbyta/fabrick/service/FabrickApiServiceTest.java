@@ -84,22 +84,22 @@ public class FabrickApiServiceTest {
                 .thenReturn(httpResponse);
         when(httpResponse.statusCode()).thenReturn(200);
         when(httpResponse.body()).thenReturn(testResponseBody);
-        when(om.readValue(eq(testResponseBody), any(TypeReference.class))).thenReturn(
-                new FabricApiBaseResponse<>("OK", Collections.emptyList(),
-                        List.of(new FabricTransactionResponse.TransactionPayload("417436013700","25000926012179",
-                                LocalDate.of(2025,6,6),LocalDate.of(2025,6,6)
-                                ,null,new BigDecimal(-0.1),"EUR","BA TERRIBILE LUCA        REC 94748B390EF241F7ABFADAF8588D9CEE TEST CUTOFF"
-                                ))
+        FabricTransactionResponse transactionResponsePayload = new FabricTransactionResponse(
+                List.of(new FabricTransactionResponse.TransactionPayload("417436013700", "25000926012179",
+                        LocalDate.of(2025, 6, 6), LocalDate.of(2025, 6, 6),
+                        null, new BigDecimal("-0.1"), "EUR", "BA TERRIBILE LUCA REC 94748B390EF241F7ABFADAF8588D9CEE TEST CUTOFF"
+                ))
+        );
 
-                )
+        when(om.readValue(eq(testResponseBody), any(TypeReference.class))).thenReturn(
+                new FabricApiBaseResponse<>("OK", Collections.emptyList(), transactionResponsePayload)
         );
 
         FabricApiBaseResponse<FabricTransactionResponse> result = fabrickApiService.getTransactionList(LocalDate.now().minusMonths(4), LocalDate.now());
 
         assertNotNull(result);
         assertNotNull(result.getPayload());
-//  todo      assertFalse(result.getPayload().getList().isEmpty());
-//        assertEquals(1, result.getPayload().getList().size());
+        assertFalse(result.getPayload().getList().isEmpty());
         verify(httpClient).send(any(), any());
     }
 
