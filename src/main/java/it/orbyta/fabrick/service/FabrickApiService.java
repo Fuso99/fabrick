@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.orbyta.fabrick.dto.request.FabricMoneyTransferRequest;
 import it.orbyta.fabrick.dto.response.*;
+import it.orbyta.fabrick.entity.TransactionEntity;
 import it.orbyta.fabrick.exception.ServiceCustomException;
+import it.orbyta.fabrick.repository.TransactionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +21,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.TimeZone;
 
 @Service
@@ -38,6 +41,8 @@ public class FabrickApiService {
 
     @Autowired
     private ObjectMapper om;
+    @Autowired
+    private TransactionRepository repository;
 
 
     private static final String HEADER_AUTH_SCHEMA = "Auth-Schema";
@@ -65,8 +70,24 @@ public class FabrickApiService {
         URI uri = new URI(baseUri + bankingAccountsUri + accountId + TRANSACTIONS_PATH + queryParams);
 
         HttpRequest request = buildGetRequest(uri);
-        return sendRequest(request, new TypeReference<>() {
+        FabricApiBaseResponse<FabricTransactionResponse> response = sendRequest(request, new TypeReference<>() {
         });
+        saveTransactionList(response);
+        return response;
+    }
+
+    private void saveTransactionList(FabricApiBaseResponse<FabricTransactionResponse> response) throws URISyntaxException, IOException, InterruptedException {
+        List<TransactionEntity> entities = response.getPayload().getList().stream().map(trans -> {
+            TransactionEntity t = new TransactionEntity();
+            t.setOperationId(trans.getOperationId());
+            t.setAccountingDate(trans.getAccountingDate());
+            t.setValueDate(trans.getValueDate());
+            t.setDescription(trans.getDescription());
+            t.setAmount(trans.getAmount());
+            t.setCurrency(trans.getCurrency());
+            return t;
+        }).toList();
+        repository.saveAll(entities);
     }
 
     public FabricApiBaseResponse<FabricMoneyTransferResponse> moneyTransfer(FabricMoneyTransferRequest requestData) throws URISyntaxException, IOException, InterruptedException {

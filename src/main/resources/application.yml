@@ -1,6 +1,17 @@
 spring:
   application:
   name: "fabrick"
+  datasource:
+    url: jdbc:h2:mem:mydb
+    username: sa
+    password: password
+    driverClassName: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true
+
 
 fabrick:
   base-uri: https://sandbox.platfr.io
