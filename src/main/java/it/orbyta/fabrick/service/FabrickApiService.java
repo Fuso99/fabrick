@@ -3,20 +3,23 @@ package it.orbyta.fabrick.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.orbyta.fabrick.dto.request.FabricMoneyTransferRequest;
-import it.orbyta.fabrick.dto.response.*;
+import it.orbyta.fabrick.dto.response.FabricApiBaseResponse;
+import it.orbyta.fabrick.dto.response.FabricBalanceResponse;
+import it.orbyta.fabrick.dto.response.FabricMoneyTransferResponse;
+import it.orbyta.fabrick.dto.response.FabricTransactionResponse;
 import it.orbyta.fabrick.entity.TransactionEntity;
-import it.orbyta.fabrick.exception.ServiceCustomException;
+import it.orbyta.fabrick.exception.TecnicalErrorException;
 import it.orbyta.fabrick.repository.TransactionRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import javax.naming.ServiceUnavailableException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -59,14 +62,14 @@ public class FabrickApiService {
     private HttpClient httpClient = HttpClient.newHttpClient();
 
 
-    public FabricApiBaseResponse<FabricBalanceResponse> getBalance() throws URISyntaxException, IOException, InterruptedException {
+    public FabricApiBaseResponse<FabricBalanceResponse> getBalance() throws Exception {
         URI uri = new URI(baseUri + bankingAccountsUri + accountId + BALANCE_PATH);
         HttpRequest request = buildGetRequest(uri);
         return sendRequest(request, new TypeReference<>() {
         });
     }
 
-    public FabricApiBaseResponse<FabricTransactionResponse> getTransactionList(LocalDate fromDate, LocalDate toDate) throws URISyntaxException, IOException, InterruptedException {
+    public FabricApiBaseResponse<FabricTransactionResponse> getTransactionList(LocalDate fromDate, LocalDate toDate) throws Exception {
         String queryParams = String.format("?fromAccountingDate=%s&toAccountingDate=%s", fromDate, toDate);
         URI uri = new URI(baseUri + bankingAccountsUri + accountId + TRANSACTIONS_PATH + queryParams);
 
@@ -77,7 +80,7 @@ public class FabrickApiService {
         return response;
     }
 
-    private void saveTransactionList(FabricApiBaseResponse<FabricTransactionResponse> response) throws URISyntaxException, IOException, InterruptedException {
+    private void saveTransactionList(FabricApiBaseResponse<FabricTransactionResponse> response) {
         List<TransactionEntity> entities = response.getPayload().getList().stream().map(trans -> {
             TransactionEntity t = new TransactionEntity();
             t.setOperationId(trans.getOperationId());
@@ -91,7 +94,7 @@ public class FabrickApiService {
         repository.saveAll(entities);
     }
 
-    public FabricApiBaseResponse<FabricMoneyTransferResponse> moneyTransfer(FabricMoneyTransferRequest requestData) throws URISyntaxException, IOException, InterruptedException {
+    public FabricApiBaseResponse<FabricMoneyTransferResponse> moneyTransfer(FabricMoneyTransferRequest requestData) throws Exception {
         URI uri = new URI(baseUri + bankingAccountsUri + accountId + MONEY_TRANSFER_PATH);
         String body = om.writeValueAsString(requestData);
 
@@ -121,7 +124,7 @@ public class FabrickApiService {
                 .build();
     }
 
-    private <T> T sendRequest(HttpRequest request, TypeReference<T> typeReference) throws IOException, InterruptedException {
+    private <T> T sendRequest(HttpRequest request, TypeReference<T> typeReference) throws Exception {
         log.debug("Sending request to URI: {}", request.uri());
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -133,17 +136,20 @@ public class FabrickApiService {
         } else if (response != null) {
             log.warn("Request failed with status {} and body {}", response.statusCode(), response.body());
             try {
-                FabricApiErrorResponse error = om.readValue(response.body(), new TypeReference<>() {
+                FabricApiBaseResponse<T> error = om.readValue(response.body(), new TypeReference<>() {
                 });
                 log.warn("Error response: {}", error);
-                throw new ServiceCustomException("Error response: {}" + error);
+                throw new TecnicalErrorException("Errore tecnico  La condizione BP049 non e' prevista per il conto id 14537780");
             } catch (Exception e) {
+                if (e instanceof TecnicalErrorException) {
+                    throw e;
+                }
                 log.error("Error while parsing error response", e);
-                throw new ServiceCustomException("Error while parsing error response");
+                throw new ServiceException("Error while parsing error response");
             }
         } else {
             log.error("Null response received from API.");
-            throw new ServiceCustomException("Null response received from API.");
+            throw new ServiceUnavailableException("Null response received from API.");
         }
 
 

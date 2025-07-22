@@ -9,7 +9,7 @@ import it.orbyta.fabrick.dto.response.FabricApiBaseResponse;
 import it.orbyta.fabrick.dto.response.FabricApiErrorResponse;
 import it.orbyta.fabrick.dto.response.FabricBalanceResponse;
 import it.orbyta.fabrick.dto.response.FabricTransactionResponse;
-import it.orbyta.fabrick.exception.ServiceCustomException;
+import it.orbyta.fabrick.exception.TecnicalErrorException;
 import it.orbyta.fabrick.repository.TransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -110,13 +110,19 @@ public class FabrickApiServiceTest {
     @Test
     void testMoneyTransferKO() throws Exception {
         String errorJson = """
+                    "status": "KO",
+                        "errors": [
                     {
                         "code": "API000",
                         "description": "Errore tecnico  La condizione BP049 non e' prevista per il conto id 14537780",
                         "params": ""
                     }
+                    ]
+                    ,
+                        "payload": {}
+                    }
                 """;
-        String errorMessage = "Error while parsing error response";
+        String errorMessage = "Errore tecnico  La condizione BP049 non e' prevista per il conto id 14537780";
         FabricMoneyTransferRequest transferRequest = createFabricMoneyTransferRequest();
 
         when(om.writeValueAsString(eq(transferRequest))).thenReturn(getExpectedMoneyTransferRequestJson());
@@ -126,13 +132,13 @@ public class FabrickApiServiceTest {
                 .thenReturn(httpResponse);
         when(httpResponse.statusCode()).thenReturn(400);
         when(httpResponse.body()).thenReturn(errorJson);
-        when(httpResponse.body()).thenReturn(errorJson);
         when(om.readValue(eq(errorJson), any(TypeReference.class)))
                 .thenReturn(
-                        new FabricApiErrorResponse("API000", "Errore tecnico  La condizione BP049 non e' prevista per il conto id 14537780", "")
+                        new FabricApiBaseResponse<>("OK",
+                                List.of(new FabricApiErrorResponse("API000", "Errore tecnico  La condizione BP049 non e' prevista per il conto id 14537780", "")), null)
                 );
 
-        ServiceCustomException thrown = assertThrows(ServiceCustomException.class, () -> fabrickApiService.moneyTransfer(createFabricMoneyTransferRequest()));
+        TecnicalErrorException thrown = assertThrows(TecnicalErrorException.class, () -> fabrickApiService.moneyTransfer(createFabricMoneyTransferRequest()));
 
         assertEquals(errorMessage, thrown.getMessage());
 

@@ -14,7 +14,7 @@ import java.util.List;
 public class FabricApiBaseResponse<T> {
 
     String status;
-    List<FabricApiErrorResponse> error;
+    List<FabricApiErrorResponse> errors;
     T payload;
 
 }
