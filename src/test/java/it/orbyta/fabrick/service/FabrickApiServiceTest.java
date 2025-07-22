@@ -10,6 +10,7 @@ import it.orbyta.fabrick.dto.response.FabricApiErrorResponse;
 import it.orbyta.fabrick.dto.response.FabricBalanceResponse;
 import it.orbyta.fabrick.dto.response.FabricTransactionResponse;
 import it.orbyta.fabrick.exception.ServiceCustomException;
+import it.orbyta.fabrick.repository.TransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,8 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -39,12 +39,14 @@ public class FabrickApiServiceTest {
 
     @Mock
     private ObjectMapper om;
-
     @Mock
     private HttpClient httpClient;
 
     @Mock
     private HttpResponse<String> httpResponse;
+
+    @Mock
+    private TransactionRepository repository;
 
 
     @BeforeEach
@@ -100,6 +102,7 @@ public class FabrickApiServiceTest {
         assertNotNull(result);
         assertNotNull(result.getPayload());
         assertFalse(result.getPayload().getList().isEmpty());
+        verify(repository).saveAll(anyList());
         verify(httpClient).send(any(), any());
     }
 
@@ -191,7 +194,7 @@ public class FabrickApiServiceTest {
         return tempMapper.writeValueAsString(createFabricMoneyTransferRequest());
     }
 
-    private String getTransactionResponseJson()  {
+    private String getTransactionResponseJson() {
         return """
                 {
                 	"status": "OK",

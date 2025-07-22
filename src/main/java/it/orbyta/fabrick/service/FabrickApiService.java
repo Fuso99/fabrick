@@ -2,7 +2,6 @@ package it.orbyta.fabrick.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.orbyta.fabrick.dto.request.FabricMoneyTransferRequest;
 import it.orbyta.fabrick.dto.response.*;
 import it.orbyta.fabrick.entity.TransactionEntity;
@@ -10,6 +9,7 @@ import it.orbyta.fabrick.exception.ServiceCustomException;
 import it.orbyta.fabrick.repository.TransactionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -40,6 +40,7 @@ public class FabrickApiService {
     private Long accountId;
 
     @Autowired
+    @Qualifier("myObjectMapper")
     private ObjectMapper om;
     @Autowired
     private TransactionRepository repository;
@@ -92,7 +93,6 @@ public class FabrickApiService {
 
     public FabricApiBaseResponse<FabricMoneyTransferResponse> moneyTransfer(FabricMoneyTransferRequest requestData) throws URISyntaxException, IOException, InterruptedException {
         URI uri = new URI(baseUri + bankingAccountsUri + accountId + MONEY_TRANSFER_PATH);
-        om.registerModule(new JavaTimeModule());
         String body = om.writeValueAsString(requestData);
 
         HttpRequest request = HttpRequest.newBuilder()

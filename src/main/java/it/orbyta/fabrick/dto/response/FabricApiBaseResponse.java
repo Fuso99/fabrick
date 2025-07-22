@@ -1,14 +1,16 @@
 package it.orbyta.fabrick.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Value;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Value
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class FabricApiBaseResponse<T> {
 
     String status;

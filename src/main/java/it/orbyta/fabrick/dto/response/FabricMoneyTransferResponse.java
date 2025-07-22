@@ -2,14 +2,16 @@ package it.orbyta.fabrick.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Value;
+import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
 @Data
-@Value
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FabricMoneyTransferResponse {
 
@@ -38,7 +40,8 @@ public class FabricMoneyTransferResponse {
     boolean hasTaxRelief;
 
     @Data
-    @Value
+    @NoArgsConstructor
+    @AllArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Account {
         String accountCode;
@@ -46,7 +49,8 @@ public class FabricMoneyTransferResponse {
     }
 
     @Data
-    @Value
+    @NoArgsConstructor
+    @AllArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Address {
         Object address;
@@ -55,7 +59,8 @@ public class FabricMoneyTransferResponse {
     }
 
     @Data
-    @Value
+    @NoArgsConstructor
+    @AllArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Amount {
         int debtorAmount;
@@ -67,7 +72,8 @@ public class FabricMoneyTransferResponse {
     }
 
     @Data
-    @Value
+    @NoArgsConstructor
+    @AllArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Creditor {
         String name;
@@ -76,7 +82,8 @@ public class FabricMoneyTransferResponse {
     }
 
     @Data
-    @Value
+    @NoArgsConstructor
+    @AllArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Debtor {
         String name;
@@ -84,7 +91,8 @@ public class FabricMoneyTransferResponse {
     }
 
     @Data
-    @Value
+    @NoArgsConstructor
+    @AllArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Fee {
         String feeCode;
