@@ -17,6 +17,6 @@ fabrick:
   base-uri: https://sandbox.platfr.io
   banking-accounts-uri: /api/gbs/banking/v4.0/accounts/
   auth-schema: S2S
-  api-key: FXOVVXXHVCPVPBZXIJOBGUGSKHDNFRRQJP
+  api-key: ${FABRICK_API_KEY}
   #  id-chiave:  3202
   account-id: 14537780
